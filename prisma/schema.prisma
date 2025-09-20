@@ -1,0 +1,157 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TokenType {
+  REFRESH
+  ACCESS
+}
+
+model JwtToken {
+  id              String    @id @default(uuid())
+  account_id      String
+  token           String    @unique
+  type            TokenType
+  active          Boolean   @default(true)   
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  expires_at      DateTime
+
+  //relations
+  account         Account   @relation(fields: [account_id], references: [id])
+}
+
+model Account {
+  id            String      @id @default(uuid())
+  username      String      @unique
+  password      String
+  re_password    String?
+  role          String      @default("USER")
+  user_id       String      @unique
+  tokens        JwtToken[]
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+
+  //relations
+  user          User        @relation(fields: [user_id], references: [id])
+}
+
+model User {
+  id              String    @id @default(uuid())
+  name            String
+  plain_name      String?
+  birthday        String?
+  phone           String?
+  email           String    @unique
+  role            String?
+  code            String?
+  sex             String?
+  address         String?
+  major_id        String?
+  intake_id       String?
+  is_graduated    Boolean   @default(false)
+  is_student      Boolean   @default(true)
+  active          Boolean   @default(true)
+  deleted         Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
+  // relations
+  major           Major?    @relation(fields: [major_id], references: [id])
+  intake          Intake?     @relation("IntakeStudents", fields: [intake_id], references: [id])
+  account         Account?
+}
+
+model Major {
+  id              String     @id @default(uuid())
+  name            String
+  plain_name      String?
+  description     String?
+  deleted         Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
+  users           User[]
+  major_intake    MajorIntake[]
+}
+
+model Intake {
+  id              String    @id @default(uuid())
+  name            String
+  plain_name      String?
+  year            Int
+  deleted         Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
+  users           User[]     @relation("IntakeStudents")
+  major_intake    MajorIntake[]
+}
+
+model Semester {
+  id              String     @id @default(uuid())
+  mi_id           String
+  name            String
+  plain_name      String
+  start_date      DateTime
+  end_date        DateTime
+  course_num      Int?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+  
+  courses         Course[]
+}
+
+model MajorIntake {
+  id              String    @id @default(uuid())
+  major_id        String
+  intake_id       String
+  head_teacher_id String?
+  total_weight    Float?
+  deleted         Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
+  major           Major     @relation(fields: [major_id], references: [id])
+  intake          Intake    @relation(fields: [intake_id], references: [id])
+  major_intake_course MajorIntakeCourse[]
+}
+
+model MajorIntakeCourse {
+  id              String    @id @default(uuid())
+  mi_id           String
+  course_id       String
+
+  major_intake   MajorIntake @relation(fields: [mi_id], references: [id])
+  course         Course      @relation(fields: [course_id], references: [id])
+}
+
+model Course {
+  id              String    @id @default(uuid())
+  semester_id     String
+  name            String
+  plain_name      String
+  weight          String?
+  description     String?
+  parent_id       String?
+
+  semester        Semester  @relation(fields: [semester_id], references: [id])
+  major_intake_courses MajorIntakeCourse[]
+}
