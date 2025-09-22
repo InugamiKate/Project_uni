@@ -49,6 +49,7 @@ export class AuthService {
       uid: account.user_id,
       account_role: account.role,
       user_role: user.role,
+      major_id: user.major_id ? user.major_id : null,
     });
     const refreshToken = signRefreshToken({ accountId: account.id });
 

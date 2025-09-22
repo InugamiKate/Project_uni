@@ -32,7 +32,7 @@ model Account {
   id            String      @id @default(uuid())
   username      String      @unique
   password      String
-  re_password    String?
+  re_password   String?
   role          String      @default("USER")
   user_id       String      @unique
   tokens        JwtToken[]
@@ -88,18 +88,14 @@ model Major {
 
 model Semester {
   id              String     @id @default(uuid())
-  mi_id           String
   name            String
   plain_name      String
   start_date      DateTime
   end_date        DateTime
-  course_num      Int?
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
   created_by      String?
   updated_by      String?
-  
-  courses         Course[]
 }
 
 model MajorIntake {
@@ -108,7 +104,7 @@ model MajorIntake {
   intake          String
   head_teacher_id String?
   total_weight    Float?
-  deleted         Boolean   @default(true)
+  deleted         Boolean   @default(false)
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
   created_by      String?
@@ -130,12 +126,20 @@ model MajorIntakeCourse {
 
 model Course {
   id              String    @id @default(uuid())
-  major_id        String
+  major_id        String?
   name            String
   plain_name      String
-  weight          String?
+  weight          Int?
   description     String?
   parent_id       String?
+  deleted         Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
 
   major_intake_courses MajorIntakeCourse[]
+  parent    Course?    @relation("CourseToChildren", fields: [parent_id], references: [id])
+  children  Course[]   @relation("CourseToChildren")
 }
