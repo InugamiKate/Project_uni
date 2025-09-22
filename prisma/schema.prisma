@@ -90,8 +90,9 @@ model Semester {
   id              String     @id @default(uuid())
   name            String
   plain_name      String
-  start_date      DateTime
-  end_date        DateTime
+  start_date      String
+  end_date        String
+  deleted         Boolean   @default(false)
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
   created_by      String?
