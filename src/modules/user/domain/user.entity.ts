@@ -10,7 +10,7 @@ export class User {
   sex?: string;
   address?: string;
   major_id?: string;
-  intake_id?: string;
+  mi_id?: string;
   is_graduated: boolean;
   is_student: boolean;
   active: boolean;

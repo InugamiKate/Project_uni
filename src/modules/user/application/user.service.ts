@@ -27,7 +27,7 @@ export class UserService {
         email: data.email,
         role: data.role,
         major_id: data.major_id,
-        intake_id: data.intake_id,
+        mi_id: data.mi_id,
         is_graduated: data.is_graduated || false,
         is_student: data.is_student || true,
         sex: data.sex,
@@ -85,7 +85,7 @@ export class UserService {
     return this.prisma.user.findUnique({
       where: { id , deleted: false },
       include: {
-        intake: true,          // lấy luôn thông tin intake
+        major_intake: true, // nếu có quan hệ major_intake
         major: true,           // nếu có quan hệ major
       },
     });

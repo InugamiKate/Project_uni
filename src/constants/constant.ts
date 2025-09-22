@@ -1,5 +1,5 @@
 
-// Constants của jwt
+// Constants of jwt
 export const TOKEN_TYPES = {
   ACCESS: 'ACCESS',
   REFRESH: 'REFRESH',
@@ -7,7 +7,7 @@ export const TOKEN_TYPES = {
 
 export type TokenType = typeof TOKEN_TYPES[keyof typeof TOKEN_TYPES];
 
-//Constants của account
+//Constants of account
 export const ACCOUNT_ROLES = {
   ADMIN: 'ADMIN',
   USER: 'USER',
@@ -15,11 +15,27 @@ export const ACCOUNT_ROLES = {
 
 export type AccountRole = typeof ACCOUNT_ROLES[keyof typeof ACCOUNT_ROLES];
 
-// Constants của user
+// Constants of user
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  USER: 'user',
+  STUDENT: 'student',
   TEACHER: 'teacher',
+  PROGRAM_HEAD: 'program_head',
 } as const;
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+
+// Constants of registration
+export const REGIS_STATUS = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const;
+
+// Constants of student_course
+export const STUDENT_COURSE_EXAM_STATUS = {
+  NOT_ATTEMPTED: 'not_attempted',
+  FAILED_ONE: 'failed_one',
+  FAILED_TWO: 'failed_two',
+  PASSED: 'passed',
+  FAILED: 'failed'
+} as const;

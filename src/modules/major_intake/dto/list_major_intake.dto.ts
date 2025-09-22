@@ -27,7 +27,7 @@ export class ListMajorIntakeDto {
   @ApiProperty({ required: false, example: 'intake-456', description: 'ID của khóa để tìm kiếm' })
   @IsOptional()
   @IsUUID()
-  intake_id?: string;
+  intake?: string;
 
   @ApiProperty({ required: false, example: 'created_at', description: 'Theo thứ tự nào, mặc định là created_at' })
   @IsOptional()

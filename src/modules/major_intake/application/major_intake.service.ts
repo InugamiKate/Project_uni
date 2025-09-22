@@ -12,20 +12,15 @@ export class MajorIntakeService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateMajorIntakeDto, user: any) {
-    const { major_id, intake_id, head_teacher_id, total_weight } = data;
+    const { major_id, intake , head_teacher_id, total_weight } = data;
 
-    if (!major_id || !intake_id) {
-      throw new Error('major_id and intake_id are required');
+    if (!major_id || !intake) {
+      throw new Error('major_id and intake are required');
     }
 
     let major = await this.prisma.major.findUnique({ where: { id: major_id, deleted: false } });
     if (!major) {
       throw new Error('Major not found for id: ' + major_id);
-    }
-
-    let intake = await this.prisma.intake.findUnique({ where: { id: intake_id, deleted: false } });
-    if (!intake) {
-      throw new Error('Intake not found for id: ' + intake_id);
     }
 
     if (head_teacher_id) {
@@ -39,7 +34,7 @@ export class MajorIntakeService {
     const majorIntake = await this.prisma.majorIntake.create({
       data: {
         major_id,
-        intake_id,
+        intake,
         head_teacher_id: head_teacher_id || null,
         total_weight,
         created_by: uid,
@@ -51,7 +46,7 @@ export class MajorIntakeService {
   }
 
   async findAll(query: ListMajorIntakeDto) {
-    const { offset, limit, orderBy, order, major_id, intake_id } = query;
+    const { offset, limit, orderBy, order, major_id, intake } = query;
 
     const where: Prisma.MajorIntakeWhereInput = {
       deleted: false,
@@ -61,8 +56,8 @@ export class MajorIntakeService {
       where.major_id = major_id;
     }
 
-    if (intake_id) {
-      where.intake_id = intake_id;
+    if (intake) {
+      where.intake = intake;
     }
 
     const list = await this.prisma.majorIntake.findMany({

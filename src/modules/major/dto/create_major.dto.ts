@@ -13,9 +13,4 @@ export class CreateMajorDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @ApiProperty({ required: false, example: 'true', description: 'Chuyên ngành đã bị xóa hay chưa, mặc định là false' })
-  @IsOptional()
-  @IsBoolean()
-  deleted?: boolean = false;
 }

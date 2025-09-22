@@ -12,7 +12,7 @@ export class CreateMajorIntakeDto {
   @ApiProperty({ required: true, example: 'intake-456', description: 'ID của khóa' })
   @IsUUID()
   @IsNotEmpty()
-  intake_id: string;
+  intake: string;
 
   @ApiProperty({ required: false, example: 'teacher-789', description: 'ID của trưởng ngành năm đó' })
   @IsUUID()

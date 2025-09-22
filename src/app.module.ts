@@ -4,12 +4,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { MajorModule } from './modules/major/major.module';
-import { IntakeModule } from './modules/intake/intake.module';
 import { MajorIntakeModule } from './modules/major_intake/major_intake.module';
 import { JwtAuthGuard } from './infrastructure/common/guard/jwtAuth.guard';
 
 @Module({
-  imports: [AuthModule, UserModule, MajorModule, IntakeModule, MajorIntakeModule],
+  imports: [AuthModule, UserModule, MajorModule, MajorIntakeModule],
   controllers: [AppController],
   providers: [AppService ,JwtAuthGuard],
 })

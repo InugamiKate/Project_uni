@@ -54,7 +54,7 @@ export class CreateUserDto {
   @ApiProperty({ required: false, description: 'ID khóa học của user' })
   @IsOptional()
   @IsUUID()
-  intake_id?: string;
+  mi_id?: string;
 
   @ApiProperty({ required: false, default: false })
   @IsOptional()

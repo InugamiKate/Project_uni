@@ -54,8 +54,8 @@ model User {
   code            String?
   sex             String?
   address         String?
+  mi_id           String?
   major_id        String?
-  intake_id       String?
   is_graduated    Boolean   @default(false)
   is_student      Boolean   @default(true)
   active          Boolean   @default(true)
@@ -66,8 +66,8 @@ model User {
   updated_by      String?
 
   // relations
-  major           Major?    @relation(fields: [major_id], references: [id])
-  intake          Intake?     @relation("IntakeStudents", fields: [intake_id], references: [id])
+  major_intake    MajorIntake?  @relation(fields: [mi_id], references: [id])
+  major           Major?        @relation(fields: [major_id], references: [id])
   account         Account?
 }
 
@@ -83,21 +83,6 @@ model Major {
   updated_by      String?
 
   users           User[]
-  major_intake    MajorIntake[]
-}
-
-model Intake {
-  id              String    @id @default(uuid())
-  name            String
-  plain_name      String?
-  year            Int
-  deleted         Boolean   @default(true)
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
-  created_by      String?
-  updated_by      String?
-
-  users           User[]     @relation("IntakeStudents")
   major_intake    MajorIntake[]
 }
 
@@ -120,7 +105,7 @@ model Semester {
 model MajorIntake {
   id              String    @id @default(uuid())
   major_id        String
-  intake_id       String
+  intake          String
   head_teacher_id String?
   total_weight    Float?
   deleted         Boolean   @default(true)
@@ -130,7 +115,7 @@ model MajorIntake {
   updated_by      String?
 
   major           Major     @relation(fields: [major_id], references: [id])
-  intake          Intake    @relation(fields: [intake_id], references: [id])
+  users           User[]
   major_intake_course MajorIntakeCourse[]
 }
 
@@ -145,13 +130,12 @@ model MajorIntakeCourse {
 
 model Course {
   id              String    @id @default(uuid())
-  semester_id     String
+  major_id        String
   name            String
   plain_name      String
   weight          String?
   description     String?
   parent_id       String?
 
-  semester        Semester  @relation(fields: [semester_id], references: [id])
   major_intake_courses MajorIntakeCourse[]
 }

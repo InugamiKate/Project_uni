@@ -1,7 +1,7 @@
 export class MajorIntake {
   id: string;
   major_id: string;
-  intake_id: string;
+  intake: string;
   head_teacher_id: string | null;
   total_weight: number;
   description: string;
