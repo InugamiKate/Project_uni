@@ -67,7 +67,16 @@ export class MajorIntakeService {
       orderBy: {
         [orderBy]: order,
       },
+      include: { major: true }
     });
+
+    for (let item of list) {
+      if (item.head_teacher_id) {
+        item['head_teacher'] = await this.prisma.user.findUnique({ where: { id: item.head_teacher_id } });
+      } else {
+        item['head_teacher'] = null;
+      }
+    }
 
     const count = await this.prisma.majorIntake.count({ where });
 

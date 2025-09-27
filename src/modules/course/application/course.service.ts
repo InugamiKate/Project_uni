@@ -15,7 +15,7 @@ export class CourseService {
 
   async create(data: CreateCourseDto, user: any) {
     let major_id = data.major_id || null;
-    if (user.account_role !== ACCOUNT_ROLES.ADMIN) {
+    if (user.account_role !== ACCOUNT_ROLES.ADMIN && !major_id) {
       major_id = user.major_id || null;
     }
 
@@ -58,6 +58,16 @@ export class CourseService {
         [orderBy]: order,
       },
     });
+
+    var already_query = {};
+    for (let item of list) {
+      if (item.major_id) {
+        if (!already_query[item.major_id]) {
+          already_query[item.major_id] = await this.prisma.major.findUnique({ where: { id: item.major_id } });
+        }
+        item['major'] = already_query[item.major_id];
+      }
+    }
 
     const count = await this.prisma.course.count({ where });
 

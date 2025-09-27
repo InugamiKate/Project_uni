@@ -69,6 +69,7 @@ model User {
   major_intake    MajorIntake?  @relation(fields: [mi_id], references: [id])
   major           Major?        @relation(fields: [major_id], references: [id])
   account         Account?
+  class           Class[]
 }
 
 model Major {
@@ -84,6 +85,7 @@ model Major {
 
   users           User[]
   major_intake    MajorIntake[]
+  classes         Class[]
 }
 
 model Semester {
@@ -97,6 +99,8 @@ model Semester {
   updated_at      DateTime  @updatedAt
   created_by      String?
   updated_by      String?
+
+  class           Class[]
 }
 
 model MajorIntake {
@@ -143,4 +147,27 @@ model Course {
   major_intake_courses MajorIntakeCourse[]
   parent    Course?    @relation("CourseToChildren", fields: [parent_id], references: [id])
   children  Course[]   @relation("CourseToChildren")
+  class     Class[]
+}
+
+model Class {
+  id              String    @id @default(uuid())
+  course_id       String
+  semester_id     String
+  major_id        String?
+  name            String
+  plain_name      String
+  lecturer_id     String
+  description     String?
+  location        String?
+  deleted         Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
+  course          Course    @relation(fields: [course_id], references: [id])
+  semester        Semester  @relation(fields: [semester_id], references: [id])
+  lecturer        User      @relation(fields: [lecturer_id], references: [id])
+  major           Major?     @relation(fields: [major_id], references: [id])
 }
