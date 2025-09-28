@@ -6,7 +6,7 @@ import { CreateClassDto } from '../dto/create_class.dto';
 import { UpdateClassDto } from '../dto/update_class.dto';
 import { ListClassDto } from '../dto/list_class.dto';
 import { TextUtil } from 'src/infrastructure/common/text.util';
-import { ACCOUNT_ROLES, USER_ROLES } from 'src/constants/constant';
+import { ACCOUNT_ROLES, USER_ROLES, CLASS_STATUS } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -28,6 +28,8 @@ export class ClassService {
       data: {
         name: data.name,
         plain_name: TextUtil.skipVN(data.name),
+        status: data.status || CLASS_STATUS.CLOSED,
+        max_student: data.max_student || 0,
         major_id: major_id,
         semester_id: data.semester_id,
         course_id: data.course_id,

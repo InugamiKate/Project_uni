@@ -1,6 +1,6 @@
 // dto/update_class.dto.ts
 
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsInt } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateClassDto {
@@ -18,4 +18,14 @@ export class UpdateClassDto {
   @IsOptional()
   @IsString()
   location?: string;
+  
+  @ApiPropertyOptional({ required: false, example: '', description: 'Status of the class' })
+  @IsString()
+  @IsOptional()
+  status? : string;
+
+  @ApiPropertyOptional({ required: false, example: '40 if null is no limited', description: 'Max number of students allowed in the class' })
+  @IsInt()
+  @IsOptional()
+  max_student: number;
 }

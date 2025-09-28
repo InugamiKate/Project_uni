@@ -6,7 +6,7 @@ import { CreateCourseDto } from '../dto/create_course.dto';
 import { UpdateCourseDto } from '../dto/update_course.dto';
 import { ListCourseDto } from '../dto/list_course.dto';
 import { TextUtil } from 'src/infrastructure/common/text.util';
-import { ACCOUNT_ROLES } from 'src/constants/constant';
+import { ACCOUNT_ROLES, USER_ROLES } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -57,6 +57,9 @@ export class CourseService {
       orderBy: {
         [orderBy]: order,
       },
+      include: {
+        StudentCourse: true,
+      }
     });
 
     var already_query = {};

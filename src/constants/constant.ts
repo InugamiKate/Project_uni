@@ -40,3 +40,12 @@ export const STUDENT_COURSE_EXAM_STATUS = {
   PASSED: 'passed',
   FAILED: 'failed'
 } as const;
+
+// Constants of class status
+export const CLASS_STATUS = {
+  CLOSED: 'closed',
+  IN_PROCESS: 'in_process',
+  AVAILABLE: 'available',
+  NOT_AVAILABLE: 'not_available',
+  MAX_NUM: 'max_num'
+} as const;

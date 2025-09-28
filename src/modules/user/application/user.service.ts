@@ -7,6 +7,7 @@ import { UpdateUserDto } from '../dto/update_user.dto';
 import { ListUserDto } from '../dto/list_user.dto';
 import {hashPassword} from '../../../infrastructure/common/crypto.util';
 import { TextUtil } from 'src/infrastructure/common/text.util';
+import { USER_ROLES, STUDENT_COURSE_EXAM_STATUS } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -17,34 +18,80 @@ export class UserService {
     const plain = data.code || '123456';
     const hashedPassword = await hashPassword(plain);
 
-    return this.prisma.user.create({ 
-      data: {
-        name: data.name,
-        plain_name: TextUtil.skipVN(data.name),
-        code: data.code,
-        birthday: data.birthday,
-        phone: data.phone,
-        email: data.email,
-        role: data.role,
-        major_id: data.major_id,
-        mi_id: data.mi_id,
-        is_graduated: data.is_graduated || false,
-        is_student: data.is_student || true,
-        sex: data.sex,
-        deleted: false,
-        active: true,
-        created_by: creator?.uid || null,
+    if (data.role !== USER_ROLES.STUDENT) {
+      return this.prisma.user.create({ 
+        data: {
+          name: data.name,
+          plain_name: TextUtil.skipVN(data.name),
+          code: data.code,
+          birthday: data.birthday,
+          phone: data.phone,
+          email: data.email,
+          role: data.role,
+          major_id: data.major_id,
+          mi_id: data.mi_id,
+          is_graduated: data.is_graduated || false,
+          is_student: data.is_student || true,
+          sex: data.sex,
+          deleted: false,
+          active: true,
+          created_by: creator?.uid || null,
 
-        account: {
-          create: {
-            username: data.email,   
+          account: {
+            create: {
+              username: data.email,   
 
-            password: hashedPassword,
-            role: 'USER',
+              password: hashedPassword,
+              role: 'USER',
+            },
           },
         },
-      },
-    });
+      });
+    } else if (data.role === USER_ROLES.STUDENT) {
+      const new_student = await this.prisma.user.create({
+        data: {
+          name: data.name,
+          plain_name: TextUtil.skipVN(data.name),
+          code: data.code,
+          birthday: data.birthday,
+          phone: data.phone,
+          email: data.email,
+          role: data.role,
+          major_id: data.major_id,
+          mi_id: data.mi_id,
+          is_graduated: data.is_graduated || false,
+          is_student: data.is_student || true,
+          sex: data.sex,
+          deleted: false,
+          active: true,
+          created_by: creator?.uid || null,
+
+          account: {
+            create: {
+              username: data.email,   
+
+              password: hashedPassword,
+              role: 'USER',
+            },
+          },
+        },
+      })
+
+      const list_courses = await this.prisma.course.findMany({
+        where: { deleted: false, major_id: data.major_id },
+      })
+
+      // create student_course for each course
+      for (let course of list_courses) {
+        await this.prisma.studentCourse.create({
+          data: {
+            student_id: new_student.id,
+            course_id: course.id,
+            exam_status: STUDENT_COURSE_EXAM_STATUS.NOT_ATTEMPTED,
+          },
+        });
+      }
+    }
   }
 
   async findAll(query: ListUserDto) {

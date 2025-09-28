@@ -70,6 +70,7 @@ model User {
   major           Major?        @relation(fields: [major_id], references: [id])
   account         Account?
   class           Class[]
+  studentCourses   StudentCourse[]
 }
 
 model Major {
@@ -148,6 +149,7 @@ model Course {
   parent    Course?    @relation("CourseToChildren", fields: [parent_id], references: [id])
   children  Course[]   @relation("CourseToChildren")
   class     Class[]
+  StudentCourse StudentCourse[]
 }
 
 model Class {
@@ -156,6 +158,8 @@ model Class {
   semester_id     String
   major_id        String?
   name            String
+  status          String    @default("closed")
+  max_student     Int?
   plain_name      String
   lecturer_id     String
   description     String?
@@ -170,4 +174,14 @@ model Class {
   semester        Semester  @relation(fields: [semester_id], references: [id])
   lecturer        User      @relation(fields: [lecturer_id], references: [id])
   major           Major?     @relation(fields: [major_id], references: [id])
+}
+
+model StudentCourse {
+  id              String  @id @default(uuid())
+  exam_status     String
+  student_id      String
+  course_id       String
+
+  course          Course  @relation(fields: [course_id], references: [id])
+  student         User    @relation(fields: [student_id], references: [id])
 }

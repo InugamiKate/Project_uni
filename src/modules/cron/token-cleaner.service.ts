@@ -8,7 +8,7 @@ export class TokenCleanerService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // chạy lúc 0h mỗi ngày
+  // Run every day at midnight
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCron() {
     this.logger.log('Running refresh token cleanup job...');
