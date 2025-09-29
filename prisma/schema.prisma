@@ -70,7 +70,9 @@ model User {
   major           Major?        @relation(fields: [major_id], references: [id])
   account         Account?
   class           Class[]
-  studentCourses   StudentCourse[]
+  studentCourses  StudentCourse[]
+  ClassRegist     ClassRegist[]
+  ClassAttend     ClassAttend[]
 }
 
 model Major {
@@ -150,6 +152,7 @@ model Course {
   children  Course[]   @relation("CourseToChildren")
   class     Class[]
   StudentCourse StudentCourse[]
+  ClassAttend   ClassAttend[]
 }
 
 model Class {
@@ -158,7 +161,8 @@ model Class {
   semester_id     String
   major_id        String?
   name            String
-  status          String    @default("closed")
+  status          String    @default("new")
+  regist_status    String    @default("closed")
   max_student     Int?
   plain_name      String
   lecturer_id     String
@@ -174,6 +178,8 @@ model Class {
   semester        Semester  @relation(fields: [semester_id], references: [id])
   lecturer        User      @relation(fields: [lecturer_id], references: [id])
   major           Major?     @relation(fields: [major_id], references: [id])
+  ClassRegist     ClassRegist[]
+  ClassAttend     ClassAttend[]
 }
 
 model StudentCourse {
@@ -184,4 +190,26 @@ model StudentCourse {
 
   course          Course  @relation(fields: [course_id], references: [id])
   student         User    @relation(fields: [student_id], references: [id])
+}
+
+model ClassRegist {
+  id              String  @id @default(uuid())
+  student_id      String
+  class_id        String
+  status          String  @default("pending")
+  created_at      DateTime @default(now())
+
+  student         User    @relation(fields: [student_id], references: [id])
+  class           Class   @relation(fields: [class_id], references: [id])
+}
+
+model ClassAttend {
+  id              String  @id @default(uuid())
+  student_id      String
+  class_id        String
+  course_id       String
+
+  student         User    @relation(fields: [student_id], references:[id])
+  class           Class   @relation(fields: [class_id], references: [id])
+  course          Course  @relation(fields: [course_id], references: [id])
 }

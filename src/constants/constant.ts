@@ -25,13 +25,6 @@ export const USER_ROLES = {
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 
-// Constants of registration
-export const REGIS_STATUS = {
-  PENDING: 'pending',
-  APPROVED: 'approved',
-  REJECTED: 'rejected',
-} as const;
-
 // Constants of student_course
 export const STUDENT_COURSE_EXAM_STATUS = {
   NOT_ATTEMPTED: 'not_attempted',
@@ -45,7 +38,20 @@ export const STUDENT_COURSE_EXAM_STATUS = {
 export const CLASS_STATUS = {
   CLOSED: 'closed',
   IN_PROCESS: 'in_process',
-  AVAILABLE: 'available',
-  NOT_AVAILABLE: 'not_available',
-  MAX_NUM: 'max_num'
+  NEW: 'new',
+  REGIST_AVAILABLE: 'regist_available',
 } as const;
+
+// Constants of class regist status
+export const REGIST_STATUS = {
+  CLOSED: 'closed',
+  OPEN: 'open',
+  MAX_NUM: 'max_num',
+} as const
+
+// Constants of class_regist
+export const CLASS_REGIST = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const

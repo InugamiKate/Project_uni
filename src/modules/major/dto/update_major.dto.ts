@@ -4,12 +4,12 @@ import { IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateMajorDto {
-  @ApiPropertyOptional({ example: 'Computer Science', description: 'Tên chuyên ngành' })
+  @ApiPropertyOptional({ example: 'Computer Science', description: 'Name of the Major' })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ example: 'Chuyên ngành về khoa học máy tính', description: 'Mô tả chuyên ngành' })
+  @ApiPropertyOptional({ example: 'Description of Computer Science', description: 'Description of Major' })
   @IsOptional()
   @IsString()
   description?: string;

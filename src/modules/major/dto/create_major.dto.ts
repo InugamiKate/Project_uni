@@ -1,15 +1,15 @@
 // dto/create_major.dto.ts
 
-import { IsBoolean, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateMajorDto {
-  @ApiProperty({ example: 'Computer Science', description: 'Tên chuyên ngành' })
+  @ApiProperty({ example: 'Computer Science', description: 'Name of Major' })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ required: false, example: 'Chuyên ngành về khoa học máy tính', description: 'Mô tả chuyên ngành' })
+  @ApiProperty({ required: false, example: 'Description of Computer Science', description: 'Description of Major' })
   @IsString()
   @IsOptional()
   description?: string;

@@ -39,10 +39,15 @@ export class CreateClassDto {
   @IsOptional()
   location?: string;
 
-  @ApiProperty({ required: false, example: 'default is closed', description: 'Status of the class' })
+  @ApiProperty({ required: false, example: 'default is new', description: 'Status of the class' })
   @IsString()
   @IsOptional()
   status? : string;
+
+  @ApiProperty({ required: false, example: 'default is closed', description: 'Regist status of the class'})
+  @IsString()
+  @IsOptional()
+  regist_status? : string;
 
   @ApiProperty({ required: false, example: '40 if null is no limited', description: 'Max number of students allowed in the class' })
   @IsInt()

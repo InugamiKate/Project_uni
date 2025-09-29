@@ -10,11 +10,7 @@ export function signRefreshToken(payload: object): string {
 }
 
 export function verifyAccessToken<T = any>(token: string): T | null {
-  try {
-    return jwt.verify(token, config.jwt.accessSecret) as T;
-  } catch {
-    return null;
-  }
+  return jwt.verify(token, config.jwt.accessSecret) as T;
 }
 
 export function verifyRefreshToken<T = any>(token: string): T | null {

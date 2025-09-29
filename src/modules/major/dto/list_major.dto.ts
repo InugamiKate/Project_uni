@@ -5,32 +5,32 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ListMajorDto {
-  @ApiProperty({required: false, example: 0, description: 'Số giá trị muốn bỏ qua, mặc định là 0' })
+  @ApiProperty({required: false, example: 0, description: 'The amount of data that should be skipped, default is 0' })
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'Offset phải là số nguyên' })
-  @Min(0, { message: 'Offset phải >= 0' })
+  @IsInt()
+  @Min(0)
   offset?: number = 0;
 
-  @ApiProperty({required: false,  example: 10, description: 'Số giá trị tối đa trả về, mặc định là 10' })
+  @ApiProperty({required: false,  example: 10, description: 'The maximum number of values to return, default is 10' })
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'Limit phải là số nguyên' })
-  @Min(1, { message: 'Limit phải >= 1' })
+  @IsInt()
+  @Min(1)
   limit?: number = 10;
 
-  @ApiProperty({required: false,  example: 'John', description: 'Tên chuyên ngành để tìm kiếm có dấu' })
+  @ApiProperty({required: false,  example: 'John', description: 'Search major by name' })
   @IsOptional()
   @IsString()
   name?: string = '';
 
-  @ApiProperty({ required: false, example: 'created_at', description: 'Theo thứ tự nào, mặc định là created_at' })
+  @ApiProperty({ required: false, example: 'created_at', description: 'Sort by which field, default is created_at' })
   @IsOptional()
   @IsString()
   orderBy: string = 'created_at';
 
-  @ApiProperty({required: false,  example: 'desc', description: 'Thứ tự sắp xếp, asc hoặc desc, mặc định là desc' })
+  @ApiProperty({required: false,  example: 'desc', description: 'Sort order, asc or desc, default is desc' })
   @IsOptional()
-  @IsIn(['asc', 'desc'], { message: 'Order phải là asc hoặc desc' })
+  @IsIn(['asc', 'desc'], { message: 'Order must be asc or desc' })
   order?: 'asc' | 'desc' = 'desc';
 }

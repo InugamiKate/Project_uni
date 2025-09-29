@@ -1,10 +1,10 @@
-// dto/list_class.dto.ts
+// dto/list_class_regist.dto.ts
 
 import { IsInt, IsOptional, IsString, IsIn, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ListClassDto {
+export class ListClassRegistDto {
   @ApiProperty({required: false, example: 0, description: 'The amount of data that should be skipped, default is 0' })
   @IsOptional()
   @Type(() => Number)
@@ -19,11 +19,6 @@ export class ListClassDto {
   @Min(1)
   limit?: number = 10;
 
-  @ApiProperty({required: false,  example: 'Class A', description: 'Search name with keyword' })
-  @IsOptional()
-  @IsString()
-  name?: string = '';
-
   @ApiProperty({ required: false, example: 'created_at', description: 'Orderby which column, default is created_at' })
   @IsOptional()
   @IsString()
@@ -34,23 +29,13 @@ export class ListClassDto {
   @IsIn(['asc', 'desc'], { message: 'Order must be either asc or desc' })
   order?: 'asc' | 'desc' = 'desc';
 
-  @ApiProperty({ required: false, example: 'semester_id', description: 'Filter by semester_id' })
+  @ApiProperty({ required: false, example: 'class_id', description: 'Filter by class_id' })
   @IsOptional()
   @IsString()
-  semester_id?: string = '';
+  class_id?: string = '';
 
-  @ApiProperty({ required: false, example: 'course_id', description: 'Filter by course_id' })
+  @ApiProperty({ required: false, example: 'student_id', description: 'Filter by student_id' })
   @IsOptional()
   @IsString()
-  course_id?: string = '';
-
-  @ApiProperty({ required: false, example: 'if nothing here take all', description: 'Status of the class' })
-  @IsString()
-  @IsOptional()
-  status? : string = '';
-
-  @ApiProperty({ required: false, example: 'if nothing here take all', description: 'Regist status of the class'})
-  @IsString()
-  @IsOptional()
-  regist_status? : string = '';
+  student_id?: string = '';
 }
