@@ -85,6 +85,10 @@ export class ClassService {
       orderBy: {
         [orderBy]: order,
       },
+      include: {
+        ClassRegist: true,
+        ClassAttend: true
+      },
     });
 
     var already_query = {};
