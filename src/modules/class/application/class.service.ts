@@ -303,8 +303,7 @@ export class ClassService {
       await this.prisma.classAttend.create({
         data: {
           class_id: this_regist.class_id,
-          student_id: this_regist.student_id,
-          course_id: this_class.course_id
+          student_id: this_regist.student_id
         }
       })
     }

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { USER_ROLES, STUDENT_COURSE_EXAM_STATUS } from 'src/constants/constant';
+import { USER_ROLES, STUDENT_COURSE_EXAM_STATUS, CLASS_REGIST } from 'src/constants/constant';
 
 @Injectable()
 export class UpdateDatabaseService {
@@ -42,6 +42,28 @@ export class UpdateDatabaseService {
             `Added student_course for student ${student.id} and course ${course.id}`,
           );
         }
+      }
+    }
+
+    // get list class_regist where user is approved
+    const class_regist = await this.prisma.classRegist.findMany({
+      where: { status: CLASS_REGIST.APPROVED }
+    })
+
+    for (const regist of class_regist) {
+      const exist = await this.prisma.classAttend.findFirst({
+        where: { class_id: regist.class_id, student_id: regist.student_id }
+      });
+      if (!exist) {
+        await this.prisma.classAttend.create({
+          data: {
+            class_id: regist.class_id,
+            student_id: regist.student_id,
+          }
+        });
+        this.logger.log(
+          `Created class_attend for regist ${regist.id}`
+        );
       }
     }
   }

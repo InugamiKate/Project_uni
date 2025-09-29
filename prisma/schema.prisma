@@ -152,7 +152,6 @@ model Course {
   children  Course[]   @relation("CourseToChildren")
   class     Class[]
   StudentCourse StudentCourse[]
-  ClassAttend   ClassAttend[]
 }
 
 model Class {
@@ -207,9 +206,7 @@ model ClassAttend {
   id              String  @id @default(uuid())
   student_id      String
   class_id        String
-  course_id       String
 
   student         User    @relation(fields: [student_id], references:[id])
   class           Class   @relation(fields: [class_id], references: [id])
-  course          Course  @relation(fields: [course_id], references: [id])
 }
