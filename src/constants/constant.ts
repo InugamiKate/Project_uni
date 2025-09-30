@@ -55,3 +55,24 @@ export const CLASS_REGIST = {
   APPROVED: 'approved',
   REJECTED: 'rejected',
 } as const
+
+// Constants of exam status
+export const EXAM_STATUS = {
+  CLOSED: 'closed',
+  IN_PROCESS: 'in_process',
+  NEW: 'new',
+  REGIST_AVAILABLE: 'regist_available',
+} as const;
+
+// Constants of exam attend
+export const EXAM_ATTEND = {
+  ATTENDED: 'attended',
+  NOT_ATTENDED: 'not_attended',
+} as const;
+
+// Constants of exam_regist
+export const EXAM_REGIST = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const

@@ -172,6 +172,11 @@ export class ClassService {
         semester: true,
         lecturer: true,
         major: true,
+        ClassAttend: {
+          include: {
+            student: true
+          }
+        },
       }
     });
   }
@@ -186,7 +191,12 @@ export class ClassService {
       throw new Error('Class not found or not available for registration');
     }
 
-    console.log("student_id: ", user)
+    const this_regist_class = await this.prisma.classRegist.findFirst({
+      where: { class_id: id, student_id: user.uid }
+    })
+    if (this_regist_class) {
+      throw new Error('You are already registered in this class');
+    }
 
     await this.prisma.classRegist.create({
       data: {

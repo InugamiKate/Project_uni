@@ -73,6 +73,8 @@ model User {
   studentCourses  StudentCourse[]
   ClassRegist     ClassRegist[]
   ClassAttend     ClassAttend[]
+  ExamRegist      ExamRegist[]
+  ExamAttend      ExamAttend[]
 }
 
 model Major {
@@ -89,6 +91,7 @@ model Major {
   users           User[]
   major_intake    MajorIntake[]
   classes         Class[]
+  exam            Exam[]
 }
 
 model Semester {
@@ -104,6 +107,7 @@ model Semester {
   updated_by      String?
 
   class           Class[]
+  exam            Exam[]
 }
 
 model MajorIntake {
@@ -152,6 +156,7 @@ model Course {
   children  Course[]   @relation("CourseToChildren")
   class     Class[]
   StudentCourse StudentCourse[]
+  exam      Exam[]
 }
 
 model Class {
@@ -179,6 +184,7 @@ model Class {
   major           Major?     @relation(fields: [major_id], references: [id])
   ClassRegist     ClassRegist[]
   ClassAttend     ClassAttend[]
+  exam            Exam[]
 }
 
 model StudentCourse {
@@ -209,4 +215,51 @@ model ClassAttend {
 
   student         User    @relation(fields: [student_id], references:[id])
   class           Class   @relation(fields: [class_id], references: [id])
+}
+
+model Exam {
+  id              String    @id @default(uuid())
+  major_id        String
+  course_id       String
+  class_id        String?
+  semester_id     String?
+  name            String
+  plain_name      String
+  date            String?
+  place           String?
+  status          String    @default("new")
+  regist_status   String    @default("closed")
+  deleted         Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?
+  updated_by      String?
+
+  major           Major     @relation(fields: [major_id], references: [id])
+  course          Course    @relation(fields: [course_id], references: [id])
+  class           Class?    @relation(fields: [class_id], references: [id])
+  semester        Semester? @relation(fields: [semester_id], references: [id])
+  ExamAttend      ExamAttend[]
+  ExamRegist      ExamRegist[]
+}
+
+model ExamRegist {
+  id              String    @id @default(uuid())
+  student_id      String
+  exam_id         String
+  status          String    @default("pending")
+  created_at      DateTime  @default(now())
+
+  student         User      @relation(fields: [student_id], references: [id])
+  exam            Exam      @relation(fields: [exam_id], references: [id])
+}
+
+model ExamAttend {
+  id              String    @id @default(uuid())
+  student_id      String
+  exam_id         String
+  status          String?
+
+  student         User      @relation(fields: [student_id], references:[id])
+  exam            Exam      @relation(fields: [exam_id], references: [id])
 }
