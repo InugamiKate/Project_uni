@@ -23,11 +23,16 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await verifyAccessToken(token); // dùng util
-      if (!payload) throw new UnauthorizedException('Invalid token');
-      request.user = payload; // gắn user payload vào request
+      const payload = verifyAccessToken(token); // dùng util đã phân biệt
+      request.user = payload;
       return true;
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message === 'TokenExpired') {
+        throw new UnauthorizedException('Token expired');
+      }
+      if (err.message === 'InvalidToken') {
+        throw new UnauthorizedException('Invalid token');
+      }
       throw new UnauthorizedException('Token verification failed');
     }
   }
