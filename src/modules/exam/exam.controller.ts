@@ -4,6 +4,10 @@ import { CreateExamDto } from './dto/create_exam.dto';
 import { UpdateExamDto } from './dto/update_exam.dto';
 import { ListExamDto } from './dto/list_exam.dto';
 import { ListExamRegistDto } from './dto/list_exam_regist.dto';
+import { ListExamAttendDto } from './dto/list_exam_attend.dto';
+import { CreateExamGradeDto } from './dto/create_exam_grade.dto';
+import { ListExamGradeDto } from './dto/list_exam_grade.dto';
+import { ListExamGradeStudentIdDto } from './dto/list_exam_grade_student_id.dto';
 import { ValidateRegistDto } from './dto/validate_regist.dto';
 import { Query } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from '../../infrastructure/common/guard/jwtAuth.guard';
@@ -63,9 +67,32 @@ export class ExamController {
     return this.examService.listExamRegist(query, user);
   }
 
+  @Get('list_attend')
+  async listExamAttend(@Query() query: ListExamAttendDto, @Req() req) {
+    const user = req.user;
+    return this.examService.listExamAttend(query, user);
+  }
+
   @Put('validate_regist/:id')
   validateRegist(@Param('id') id: string, @Body() dto: ValidateRegistDto, @Req() req) {
     const user = req.user;
     return this.examService.validateRegist(String(id), dto, user);
+  }
+
+  @Post('create_grades/:id')
+  createExamGrades(@Param('id') id: string, @Body() dto: CreateExamGradeDto, @Req() req) {
+    return this.examService.addExamGrades(String(id), dto);
+  }
+
+  @Get('list_grades_exam/:examId')
+  async listExamGrades(@Param('examId') examId: string, @Query() query: ListExamGradeDto, @Req() req) {
+    const user = req.user;
+    return this.examService.listExamGrades(examId, query, user);
+  }
+
+  @Get('list_grades_student')
+  async listExamGradesStudent(@Query() query: ListExamGradeStudentIdDto, @Req() req) {
+    const user = req.user;
+    return this.examService.listExamGradesStudent(query, user);
   }
 }

@@ -75,6 +75,7 @@ model User {
   ClassAttend     ClassAttend[]
   ExamRegist      ExamRegist[]
   ExamAttend      ExamAttend[]
+  ExamGrade       ExamGrade[]
 }
 
 model Major {
@@ -166,7 +167,7 @@ model Class {
   major_id        String?
   name            String
   status          String    @default("new")
-  regist_status    String    @default("closed")
+  regist_status   String    @default("closed")
   max_student     Int?
   plain_name      String
   lecturer_id     String
@@ -192,6 +193,7 @@ model StudentCourse {
   exam_status     String
   student_id      String
   course_id       String
+  last_exam_id    String?
 
   course          Course  @relation(fields: [course_id], references: [id])
   student         User    @relation(fields: [student_id], references: [id])
@@ -241,6 +243,7 @@ model Exam {
   semester        Semester? @relation(fields: [semester_id], references: [id])
   ExamAttend      ExamAttend[]
   ExamRegist      ExamRegist[]
+  ExamGrade       ExamGrade[]
 }
 
 model ExamRegist {
@@ -261,5 +264,17 @@ model ExamAttend {
   status          String?
 
   student         User      @relation(fields: [student_id], references:[id])
+  exam            Exam      @relation(fields: [exam_id], references: [id])
+}
+
+model ExamGrade {
+  id              String    @id @default(uuid())
+  student_id      String
+  exam_id         String
+  grade           Float
+  is_passed       Boolean   @default(true)
+  created_at      DateTime  @default(now())
+
+  student         User      @relation(fields: [student_id], references: [id])
   exam            Exam      @relation(fields: [exam_id], references: [id])
 }

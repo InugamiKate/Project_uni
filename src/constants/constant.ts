@@ -28,13 +28,11 @@ export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 // Constants of student_course
 export const STUDENT_COURSE_EXAM_STATUS = {
   NOT_ATTEMPTED: 'not_attempted',
-  FAILED_ONE: 'failed_one',
-  FAILED_TWO: 'failed_two',
   PASSED: 'passed',
   FAILED: 'failed'
 } as const;
 
-// Constants of class status
+// Constants of class_status
 export const CLASS_STATUS = {
   CLOSED: 'closed',
   IN_PROCESS: 'in_process',
@@ -42,7 +40,7 @@ export const CLASS_STATUS = {
   REGIST_AVAILABLE: 'regist_available',
 } as const;
 
-// Constants of class regist status
+// Constants of class regist_status
 export const REGIST_STATUS = {
   CLOSED: 'closed',
   OPEN: 'open',
@@ -56,7 +54,7 @@ export const CLASS_REGIST = {
   REJECTED: 'rejected',
 } as const
 
-// Constants of exam status
+// Constants of exam_status
 export const EXAM_STATUS = {
   CLOSED: 'closed',
   IN_PROCESS: 'in_process',
@@ -64,7 +62,7 @@ export const EXAM_STATUS = {
   REGIST_AVAILABLE: 'regist_available',
 } as const;
 
-// Constants of exam attend
+// Constants of exam_attend
 export const EXAM_ATTEND = {
   ATTENDED: 'attended',
   NOT_ATTENDED: 'not_attended',

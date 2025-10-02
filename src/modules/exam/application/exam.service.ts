@@ -6,9 +6,13 @@ import { CreateExamDto } from '../dto/create_exam.dto';
 import { UpdateExamDto } from '../dto/update_exam.dto';
 import { ListExamDto } from '../dto/list_exam.dto';
 import { ListExamRegistDto } from '../dto/list_exam_regist.dto';
+import { ListExamAttendDto } from '../dto/list_exam_attend.dto';
 import { ValidateRegistDto } from '../dto/validate_regist.dto';
+import { CreateExamGradeDto } from '../dto/create_exam_grade.dto';
+import { ListExamGradeDto } from '../dto/list_exam_grade.dto';
+import { ListExamGradeStudentIdDto } from '../dto/list_exam_grade_student_id.dto';
 import { TextUtil } from 'src/infrastructure/common/text.util';
-import { ACCOUNT_ROLES, USER_ROLES, EXAM_ATTEND, EXAM_STATUS, REGIST_STATUS, EXAM_REGIST } from 'src/constants/constant';
+import { ACCOUNT_ROLES, USER_ROLES, STUDENT_COURSE_EXAM_STATUS, EXAM_STATUS, REGIST_STATUS, EXAM_REGIST } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -81,6 +85,17 @@ export class ExamService {
       where.regist_status = query.regist_status;
     }
 
+    if (user.user_role === USER_ROLES.STUDENT) {
+      where.course = {
+        StudentCourse: {
+          some: {
+            student_id: user.uid,
+            exam_status: { not: STUDENT_COURSE_EXAM_STATUS.PASSED },
+          },
+        },
+      };
+    }
+
     const list = await this.prisma.exam.findMany({
       where,
       skip: Number(offset) || 0,
@@ -90,7 +105,8 @@ export class ExamService {
       },
       include: {
         ExamRegist: true,
-        ExamAttend: true
+        ExamAttend: true,
+        course: true,
       },
     });
 
@@ -120,6 +136,26 @@ export class ExamService {
           already_query[item.class_id] = await this.prisma.class.findUnique({ where: { id: item.class_id } });
         }
         item['class'] = already_query[item.class_id];
+      }
+      if (user.user_role === USER_ROLES.STUDENT) {
+        if (item.ExamRegist && item.ExamRegist.length > 0) {
+          const regist = item.ExamRegist.find(r => r.student_id === user.uid);
+          if (regist) {
+            item['my_regist'] = regist;
+          }
+          else {
+            item['my_regist'] = null;
+          }
+        }
+        if (item.ExamAttend && item.ExamAttend.length > 0) {
+          const attend = item.ExamAttend.find(a => a.student_id === user.uid);
+          if (attend) {
+            item['my_attend'] = attend;
+          }
+          else {
+            item['my_attend'] = null;
+          }
+        }
       }
     }
 
@@ -268,6 +304,34 @@ export class ExamService {
     return { list, count };
   }
 
+    async listExamAttend(query: ListExamAttendDto, user: any) {
+    const { offset, limit, exam_id, student_id } = query;
+
+    const where: Prisma.ExamAttendWhereInput = {};
+
+    if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+      throw new Error('You do not have permission to view exam attendances');
+    }
+
+    if (exam_id) {
+      where.exam_id = exam_id;
+    }
+
+    if (student_id) {
+      where.student_id = student_id;
+    }
+
+    const list = await this.prisma.examAttend.findMany({
+      where,
+      skip: Number(offset) || 0,
+      take: Number(limit) || 10,
+    });
+
+    const count = await this.prisma.examAttend.count({ where });
+
+    return { list, count };
+  }
+
   async validateRegist(id: string, data: ValidateRegistDto, user: any) {
     if (!id) {
       throw new Error('ID is required for validate regist');
@@ -277,7 +341,7 @@ export class ExamService {
       throw new Error('You do not have permission to validate exam registrations');
     }
 
-    const this_regist = await this.prisma.examRegist.findUnique({ where: { id : id } });
+    const this_regist = await this.prisma.examRegist.findUnique({ where: { id : id, status: EXAM_REGIST.PENDING } });
     if (!this_regist) {
       throw new Error('Exam registration not found');
     }
@@ -302,6 +366,125 @@ export class ExamService {
         }
       })
     }
+    return { message: 'Exam registration validated successfully' };
+  }
+
+  async addExamGrades(examId: string, dto: CreateExamGradeDto) {
+
+    if (!dto.grades || dto.grades.length === 0) {
+      throw new Error('No grades provided');
+    }
+
+    const exam = await this.prisma.exam.findUnique({ where: { id: examId } });
+    if (!exam) {
+      throw new Error('Exam not found');
+    }
+
+    const course_id = exam.course_id;
+
+    const data = dto.grades.map((item) => ({
+      exam_id: examId,
+      student_id: item.user_id,
+      grade: item.grade,
+      is_passed: item.is_passed,
+    }));
+
+    await this.prisma.examGrade.createMany({
+      data,
+    });
+
+    for (let item of dto.grades) {
+      await this.prisma.studentCourse.updateMany({
+        where:
+        {
+          student_id : item.user_id,
+          course_id  : course_id
+        },
+        data:
+        {
+          exam_status: item.is_passed ? STUDENT_COURSE_EXAM_STATUS.PASSED : STUDENT_COURSE_EXAM_STATUS.FAILED,
+          last_exam_id: examId
+        }
+      })
+    }
+
+    return { success: true, count: data.length };
+  }
+
+  async listExamGrades(examId: string, query: ListExamGradeDto, user: any) {
+    const { offset, limit, orderBy, order } = query;
+
+    console.log('listExamGrades called with examId:', examId, 'and query:', query);
+    
+    const where: Prisma.ExamGradeWhereInput = {
+      exam_id: examId
+    };
+
+    const list = await this.prisma.examGrade.findMany({
+      where: where,
+      skip: Number(offset) || 0,
+      take: Number(limit) || 10,
+      orderBy: {
+        [orderBy || 'grade']: order || 'desc',
+      },
+    });
+
+    const count = await this.prisma.examGrade.count({ where });
+
+    return { list, count };
+  }
+
+  async listExamGradesStudent(query: ListExamGradeStudentIdDto, user: any) {
+    const { offset, limit, orderBy, order } = query;
+
+    var user_id = user.uid;
+
+    if (user.user_role === USER_ROLES.ADMIN || user.user_role === USER_ROLES.PROGRAM_HEAD) {
+      user_id = query.student_id;
+      if (!user_id) {
+        throw new Error('student_id is required for non-student users');
+      }
+    }
+
+    const where: Prisma.CourseWhereInput = {
+      deleted: false,
+      StudentCourse: {
+        some: {
+          student_id: user_id,
+        }
+      }
+    };
+
+    const list = await this.prisma.course.findMany({
+      where: where,
+      skip: Number(offset) || 0,
+      take: Number(limit) || 10,
+      orderBy: {
+        [orderBy || 'created_at']: order || 'desc',
+      },
+      include: {
+        exam: {
+          include: {
+            ExamGrade: true,
+          }
+        }
+      },
+    });
+
+    // Filter out the exam grades for the current student
+    const filteredList = list.map(course => ({
+      ...course,
+      exam: course.exam.map(exam => ({
+        ...exam,
+        ExamGrade: exam.ExamGrade.filter(
+          grade => grade.student_id === user_id
+        ),
+      })),
+    }));
+
+    const count = await this.prisma.course.count({ where });
+
+    return { filteredList, count };
   }
 
 }

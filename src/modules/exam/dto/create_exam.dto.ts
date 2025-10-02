@@ -1,6 +1,6 @@
 // dto/create_exam.dto.ts
 
-import { IsNotEmpty, IsString, IsOptional, IsUUID, IsInt } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateExamDto {
@@ -9,12 +9,12 @@ export class CreateExamDto {
   @IsOptional()
   major_id: string;
 
-  @ApiProperty({ example: 'This is the id of semester', description: 'Id of semester' })
+  @ApiProperty({ example: 'This is the id of semester required', description: 'Id of semester' })
   @IsUUID()
   @IsNotEmpty()
   semester_id: string;
 
-  @ApiProperty({ example: 'This is the id of course', description: 'Id of course' })
+  @ApiProperty({ example: 'This is the id of course required', description: 'Id of course' })
   @IsUUID()
   @IsNotEmpty()
   course_id: string;
@@ -24,7 +24,7 @@ export class CreateExamDto {
   @IsOptional()
   class_id?: string;
 
-  @ApiProperty({ example: 'English 101 Exam', description: 'Name of the exam' })
+  @ApiProperty({ example: 'English 101 Exam required', description: 'Name of the exam' })
   @IsString()
   @IsNotEmpty()
   name: string;
