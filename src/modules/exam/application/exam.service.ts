@@ -26,7 +26,7 @@ export class ExamService {
     }
 
     // Only admin and program_head can create exams
-    if (user.account_role !== ACCOUNT_ROLES.ADMIN && user.account_role !== USER_ROLES.PROGRAM_HEAD) {
+    if (user.user_role !== ACCOUNT_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
       throw new ForbiddenException('You do not have permission to create an exam');
     }
 
