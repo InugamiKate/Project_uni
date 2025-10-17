@@ -304,3 +304,21 @@ model NotificationUser {
 
   notification    Notification  @relation(fields: [notification_id], references: [id])
 }
+
+model Timetable {
+  id              String        @id @default(uuid())
+  major_id        String?
+  mi_id           String?
+  name            String
+  description     String?
+  location        String?
+  day             String
+  period          String
+  time_start      DateTime?
+  time_end        DateTime?
+  object_type     String
+  object_id       String?
+  is_deleted      Boolean       @default(false)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+}

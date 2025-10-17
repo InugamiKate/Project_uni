@@ -84,3 +84,28 @@ export const NOTIFICATION_OBJECT_TYPE = {
   EXAM: 'EXAM',
   OTHER: 'OTHER',
 } as const;
+
+// Constants of day of week
+export const DAY_OF_WEEK = {
+  MONDAY: 'MONDAY',
+  TUESDAY: 'TUESDAY',
+  WEDNESDAY: 'WEDNESDAY',
+  THURSDAY: 'THURSDAY',
+  FRIDAY: 'FRIDAY',
+  SATURDAY: 'SATURDAY',
+  SUNDAY: 'SUNDAY',
+} as const;
+
+// Contstants of period of day
+export const PERIOD_OF_DAY = {
+  MORNING: 'MORNING',
+  AFTERNOON: 'AFTERNOON',
+  EVENING: 'EVENING',
+} as const;
+
+// Constants of timetable object type
+export const TIMETABLE_OBJECT_TYPE = {
+  CLASS: 'CLASS',
+  EXAM: 'EXAM',
+  OTHER: 'OTHER',
+} as const;

@@ -11,11 +11,12 @@ import { ClassModule } from './modules/class/class.module';
 import { ExamModule } from './modules/exam/exam.module';
 import { CronModule } from './modules/cron/cron.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { TimetableModule } from './modules/timetable/timetable.module';
 import { JwtAuthGuard } from './infrastructure/common/guard/jwtAuth.guard';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), CronModule, AuthModule, UserModule, MajorModule, MajorIntakeModule, CourseModule, SemesterModule, ClassModule, ExamModule, NotificationModule],
+  imports: [ScheduleModule.forRoot(), CronModule, AuthModule, UserModule, MajorModule, MajorIntakeModule, CourseModule, SemesterModule, ClassModule, ExamModule, NotificationModule, TimetableModule],
   controllers: [AppController],
   providers: [AppService ,JwtAuthGuard],
 })
