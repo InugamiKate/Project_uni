@@ -74,3 +74,13 @@ export const EXAM_REGIST = {
   APPROVED: 'approved',
   REJECTED: 'rejected',
 } as const
+
+// Constants of notification object_type
+export const NOTIFICATION_OBJECT_TYPE = {
+  ALL: 'ALL',
+  INTAKE: 'INTAKE',
+  COURSE: 'COURSE',
+  CLASS: 'CLASS',
+  EXAM: 'EXAM',
+  OTHER: 'OTHER',
+} as const;
