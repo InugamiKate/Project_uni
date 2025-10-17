@@ -1,12 +1,12 @@
 // application/course.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateCourseDto } from '../dto/create_course.dto';
 import { UpdateCourseDto } from '../dto/update_course.dto';
 import { ListCourseDto } from '../dto/list_course.dto';
 import { TextUtil } from 'src/infrastructure/common/text.util';
-import { ACCOUNT_ROLES, USER_ROLES } from 'src/constants/constant';
+import { ACCOUNT_ROLES } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -79,20 +79,20 @@ export class CourseService {
 
   async update(id: string, data: UpdateCourseDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for update');
+      throw new BadRequestException('ID is required for update');
     }
 
     const course = await this.prisma.course.findUnique({ where: { id : id, deleted: false } });
     if (!course) {
       console.log('Course not found for id:', id);
-      throw new Error('Course not found');
+      throw new NotFoundException('Course not found');
     }
 
     if (data.parent_id) {
       const parentCourse = await this.prisma.course.findUnique({ where: { id: data.parent_id, deleted: false } });
       if (!parentCourse) {
         console.log('Parent course not found for id:', data.parent_id);
-        throw new Error('Parent course not found');
+        throw new NotFoundException('Parent course not found');
       }
     }
 
@@ -108,12 +108,12 @@ export class CourseService {
 
   async softDelete(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for delete');
+      throw new BadRequestException('ID is required for delete');
     }
 
     const course = await this.prisma.course.findUnique({ where: { id : id, deleted: false } });
     if (!course) {
-      throw new Error('Course not found');
+      throw new NotFoundException('Course not found');
     }
 
     const uid = user?.uid || null;

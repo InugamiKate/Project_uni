@@ -1,6 +1,6 @@
 // application/major_intake.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateMajorIntakeDto } from '../dto/create_major_intake.dto';
 import { UpdateMajorIntakeDto } from '../dto/update_major_intake.dto';
@@ -15,18 +15,18 @@ export class MajorIntakeService {
     const { major_id, intake , head_teacher_id, total_weight } = data;
 
     if (!major_id || !intake) {
-      throw new Error('major_id and intake are required');
+      throw new BadRequestException('major_id and intake are required');
     }
 
     let major = await this.prisma.major.findUnique({ where: { id: major_id, deleted: false } });
     if (!major) {
-      throw new Error('Major not found for id: ' + major_id);
+      throw new NotFoundException('Major not found for id: ' + major_id);
     }
 
     if (head_teacher_id) {
       let teacher = await this.prisma.user.findUnique({ where: { id: head_teacher_id, deleted: false } });
       if (!teacher) {
-        throw new Error('User not found: ' + head_teacher_id);
+        throw new NotFoundException('User not found: ' + head_teacher_id);
       }
     }
 
@@ -85,18 +85,18 @@ export class MajorIntakeService {
 
   async update(id: string, data: UpdateMajorIntakeDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for update');
+      throw new BadRequestException('ID is required for update');
     }
 
-    const major_intake = await this.prisma.majorIntake.findUnique({ 
-      where: { id : id, deleted: false },
+    const major_intake = await this.prisma.majorIntake.findUnique({
+      where: { id: id, deleted: false },
       include: { major_intake_course: true }
     });
 
     if (!major_intake) {
       console.log('Major intake not found for id:', id);
       console.log('major_intake:', major_intake);
-      throw new Error('Major intake not found');
+      throw new NotFoundException('Major intake not found');
     }
 
     // const courses = data.courses ? JSON.stringify(data.courses) : major_intake.courses;
@@ -112,12 +112,12 @@ export class MajorIntakeService {
 
   async softDelete(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for delete');
+      throw new BadRequestException('ID is required for delete');
     }
 
     const major_intake = await this.prisma.majorIntake.findUnique({ where: { id : id, deleted: false } });
     if (!major_intake) {
-      throw new Error('Major intake not found');
+      throw new NotFoundException('Major intake not found');
     }
 
     const uid = user?.uid || null;

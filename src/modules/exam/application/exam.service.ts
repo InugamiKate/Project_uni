@@ -1,6 +1,6 @@
 // application/exam.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateExamDto } from '../dto/create_exam.dto';
 import { UpdateExamDto } from '../dto/update_exam.dto';
@@ -27,7 +27,7 @@ export class ExamService {
 
     // Only admin and program_head can create exams
     if (user.account_role !== ACCOUNT_ROLES.ADMIN && user.account_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to create an exam');
+      throw new ForbiddenException('You do not have permission to create an exam');
     }
 
     return this.prisma.exam.create({
@@ -166,13 +166,13 @@ export class ExamService {
 
   async update(id: string, data: UpdateExamDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for update');
+      throw new BadRequestException('ID is required for update');
     }
 
     const exam = await this.prisma.exam.findUnique({ where: { id : id, deleted: false } });
     if (!exam) {
       console.log('Exam not found for id:', id);
-      throw new Error('Exam not found');
+      throw new NotFoundException('Exam not found');
     }
 
     const plainName = TextUtil.skipVN(data.name || exam.name);
@@ -187,12 +187,12 @@ export class ExamService {
 
   async softDelete(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for delete');
+      throw new BadRequestException('ID is required for delete');
     }
 
     const exam = await this.prisma.exam.findUnique({ where: { id : id, deleted: false } });
     if (!exam) {
-      throw new Error('Exam not found');
+      throw new NotFoundException('Exam not found');
     }
 
     const uid = user?.uid || null;
@@ -217,12 +217,12 @@ export class ExamService {
 
   async registExam(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for regist');
+      throw new BadRequestException('ID is required for regist');
     }
 
     const this_exam = await this.prisma.exam.findUnique({ where: { id : id, deleted: false, status: EXAM_STATUS.REGIST_AVAILABLE, regist_status: REGIST_STATUS.OPEN } });
     if (!this_exam) {
-      throw new Error('Exam not found or not available for registration');
+      throw new NotFoundException('Exam not found or not available for registration');
     }
 
     const this_regist_exam = await this.prisma.examRegist.findFirst({
@@ -230,7 +230,7 @@ export class ExamService {
     });
 
     if (this_regist_exam) {
-      throw new Error('You are already registered in this exam');
+      throw new ForbiddenException('You are already registered in this exam');
     }
 
     await this.prisma.examRegist.create({
@@ -246,16 +246,16 @@ export class ExamService {
 
   async unregistExam(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for unregist');
+      throw new BadRequestException('ID is required for unregist');
     }
 
     const this_exam = await this.prisma.exam.findUnique({ where: { id : id, deleted: false } });
     if (!this_exam) {
-      throw new Error('Exam not found');
+      throw new NotFoundException('Exam not found');
     }
 
     if (this_exam.status !== EXAM_STATUS.REGIST_AVAILABLE && this_exam.regist_status !== REGIST_STATUS.OPEN) {
-      throw new Error('Exam is not open for unregistration');
+      throw new ForbiddenException('Exam is not open for unregistration');
     }
 
     const this_regist_exam = await this.prisma.examRegist.findFirst({
@@ -263,7 +263,7 @@ export class ExamService {
     })
 
     if (!this_regist_exam) {
-      throw new Error('You are not registered in this exam');
+      throw new NotFoundException('You are not registered in this exam');
     }
 
     await this.prisma.examRegist.delete({
@@ -279,7 +279,7 @@ export class ExamService {
     const where: Prisma.ExamRegistWhereInput = {};
 
     if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to view exam registrations');
+      throw new ForbiddenException('You do not have permission to view exam registrations');
     }
 
     if (exam_id) {
@@ -310,7 +310,7 @@ export class ExamService {
     const where: Prisma.ExamAttendWhereInput = {};
 
     if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to view exam attendances');
+      throw new ForbiddenException('You do not have permission to view exam attendances');
     }
 
     if (exam_id) {
@@ -334,21 +334,21 @@ export class ExamService {
 
   async validateRegist(id: string, data: ValidateRegistDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for validate regist');
+      throw new BadRequestException('ID is required for validate regist');
     }
 
     if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to validate exam registrations');
+      throw new ForbiddenException('You do not have permission to validate exam registrations');
     }
 
     const this_regist = await this.prisma.examRegist.findUnique({ where: { id : id, status: EXAM_REGIST.PENDING } });
     if (!this_regist) {
-      throw new Error('Exam registration not found');
+      throw new NotFoundException('Exam registration not found');
     }
 
     const this_exam = await this.prisma.exam.findUnique({ where: { id : this_regist.exam_id, deleted: false } });
     if (!this_exam) {
-      throw new Error('Exam not found');
+      throw new NotFoundException('Exam not found');
     }
 
     const status = data.valid ? EXAM_REGIST.APPROVED : EXAM_REGIST.REJECTED;
@@ -372,12 +372,12 @@ export class ExamService {
   async addExamGrades(examId: string, dto: CreateExamGradeDto) {
 
     if (!dto.grades || dto.grades.length === 0) {
-      throw new Error('No grades provided');
+      throw new BadRequestException('No grades provided');
     }
 
     const exam = await this.prisma.exam.findUnique({ where: { id: examId } });
     if (!exam) {
-      throw new Error('Exam not found');
+      throw new NotFoundException('Exam not found');
     }
 
     const course_id = exam.course_id;
@@ -442,7 +442,7 @@ export class ExamService {
     if (user.user_role === USER_ROLES.ADMIN || user.user_role === USER_ROLES.PROGRAM_HEAD) {
       user_id = query.student_id;
       if (!user_id) {
-        throw new Error('student_id is required for non-student users');
+        throw new BadRequestException('student_id is required for non-student users');
       }
     }
 

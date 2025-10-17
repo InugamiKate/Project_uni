@@ -5,7 +5,7 @@ import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateNotificationDto } from '../dto/create_notification.dto';
 import { ListNotificationDto } from '../dto/list_notification.dto';
 import { ACCOUNT_ROLES, USER_ROLES, NOTIFICATION_OBJECT_TYPE } from 'src/constants/constant';
-import { BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class NotificationService {

@@ -1,6 +1,6 @@
 // application/semester.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateSemesterDto } from '../dto/create_semester.dto';
 import { UpdateSemesterDto } from '../dto/update_semester.dto';
@@ -54,13 +54,13 @@ export class SemesterService {
 
   async update(id: string, data: UpdateSemesterDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for update');
+      throw new BadRequestException('ID is required for update');
     }
 
     const semester = await this.prisma.semester.findUnique({ where: { id : id, deleted: false } });
     if (!semester) {
       console.log('Semester not found for id:', id);
-      throw new Error('Semester not found');
+      throw new NotFoundException('Semester not found');
     }
 
     const plainName = TextUtil.skipVN(data.name || semester.name);
@@ -75,12 +75,12 @@ export class SemesterService {
 
   async softDelete(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for delete');
+      throw new BadRequestException('ID is required for delete');
     }
 
     const semester = await this.prisma.semester.findUnique({ where: { id : id, deleted: false } });
     if (!semester) {
-      throw new Error('Semester not found');
+      throw new NotFoundException('Semester not found');
     }
 
     const uid = user?.uid || null;

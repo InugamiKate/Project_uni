@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { comparePassword } from '../../../infrastructure/common/crypto.util';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../../infrastructure/common/jwt.util';
-import { ACCOUNT_ROLES } from '../../../constants/constant';
 import { AccountEntity } from '../domain/account.entity';
 import { config } from '../../../config/config';
 

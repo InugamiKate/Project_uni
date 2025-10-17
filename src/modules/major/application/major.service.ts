@@ -1,6 +1,6 @@
 // application/major.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateMajorDto } from '../dto/create_major.dto';
 import { UpdateMajorDto } from '../dto/update_major.dto';
@@ -53,14 +53,14 @@ export class MajorService {
 
   async update(id: string, data: UpdateMajorDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for update');
+      throw new BadRequestException('ID is required for update');
     }
 
     const major = await this.prisma.major.findUnique({ where: { id : id, deleted: false } });
     if (!major) {
       console.log('Major not found for id:', id);
       console.log('major:', major);
-      throw new Error('Major not found');
+      throw new NotFoundException('Major not found');
     }
 
     const plainName = TextUtil.skipVN(data.name || major.name);
@@ -75,12 +75,12 @@ export class MajorService {
 
   async softDelete(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for delete');
+      throw new BadRequestException('ID is required for delete');
     }
 
     const major = await this.prisma.major.findUnique({ where: { id : id, deleted: false } });
     if (!major) {
-      throw new Error('Major not found');
+      throw new NotFoundException('Major not found');
     }
 
     const uid = user?.uid || null;

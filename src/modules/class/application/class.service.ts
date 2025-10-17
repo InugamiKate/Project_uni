@@ -1,6 +1,6 @@
 // application/class.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateClassDto } from '../dto/create_class.dto';
 import { UpdateClassDto } from '../dto/update_class.dto';
@@ -23,7 +23,7 @@ export class ClassService {
 
     // Only admin and program_head can create class
     if (user.account_role !== ACCOUNT_ROLES.ADMIN && user.account_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to create a class');
+      throw new ForbiddenException('You do not have permission to create a class');
     }
 
     return this.prisma.class.create({
@@ -127,13 +127,13 @@ export class ClassService {
 
   async update(id: string, data: UpdateClassDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for update');
+      throw new BadRequestException('ID is required for update');
     }
 
     const class_ = await this.prisma.class.findUnique({ where: { id : id, deleted: false } });
     if (!class_) {
       console.log('Class not found for id:', id);
-      throw new Error('Class not found');
+      throw new NotFoundException('Class not found');
     }
 
     const plainName = TextUtil.skipVN(data.name || class_.name);
@@ -148,12 +148,12 @@ export class ClassService {
 
   async softDelete(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for delete');
+      throw new BadRequestException('ID is required for delete');
     }
 
     const class_ = await this.prisma.class.findUnique({ where: { id : id, deleted: false } });
     if (!class_) {
-      throw new Error('Class not found');
+      throw new NotFoundException('Class not found');
     }
 
     const uid = user?.uid || null;
@@ -183,19 +183,19 @@ export class ClassService {
 
   async registClass(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for regist');
+      throw new BadRequestException('ID is required for regist');
     }
 
     const this_class = await this.prisma.class.findUnique({ where: { id : id, deleted: false, status: CLASS_STATUS.REGIST_AVAILABLE, regist_status: REGIST_STATUS.OPEN } });
     if (!this_class) {
-      throw new Error('Class not found or not available for registration');
+      throw new NotFoundException('Class not found or not available for registration');
     }
 
     const this_regist_class = await this.prisma.classRegist.findFirst({
       where: { class_id: id, student_id: user.uid }
     })
     if (this_regist_class) {
-      throw new Error('You are already registered in this class');
+      throw new ForbiddenException('You are already registered in this class');
     }
 
     await this.prisma.classRegist.create({
@@ -222,12 +222,12 @@ export class ClassService {
 
   async unregistClass(id: string, user: any) {
     if (!id) {
-      throw new Error('ID is required for unregist');
+      throw new BadRequestException('ID is required for unregist');
     }
 
     const this_class = await this.prisma.class.findUnique({ where: { id : id, deleted: false } });
     if (!this_class) {
-      throw new Error('Class not found');
+      throw new NotFoundException('Class not found');
     }
 
     const this_regist_class = await this.prisma.classRegist.findFirst({
@@ -235,7 +235,7 @@ export class ClassService {
     })
 
     if (!this_regist_class) {
-      throw new Error('You are not registered in this class');
+      throw new ForbiddenException('You are not registered in this class');
     }
 
     await this.prisma.classRegist.delete({
@@ -258,7 +258,7 @@ export class ClassService {
     const where: Prisma.ClassRegistWhereInput = {};
 
     if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to view class registrations');
+      throw new ForbiddenException('You do not have permission to view class registrations');
     }
 
     if (class_id) {
@@ -285,21 +285,21 @@ export class ClassService {
 
   async validateRegist(id: string, data: ValidateRegistDto, user: any) {
     if (!id) {
-      throw new Error('ID is required for validate regist');
+      throw new BadRequestException('ID is required for validate regist');
     }
 
     if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new Error('You do not have permission to validate class registrations');
+      throw new ForbiddenException('You do not have permission to validate class registrations');
     }
 
     const this_regist = await this.prisma.classRegist.findUnique({ where: { id : id } });
     if (!this_regist) {
-      throw new Error('Class registration not found');
+      throw new NotFoundException('Class registration not found');
     }
 
     const this_class = await this.prisma.class.findUnique({ where: { id : this_regist.class_id, deleted: false } });
     if (!this_class) {
-      throw new Error('Class not found');
+      throw new NotFoundException('Class not found');
     }
 
     const status = data.valid ? CLASS_REGIST.APPROVED : CLASS_REGIST.REJECTED;
