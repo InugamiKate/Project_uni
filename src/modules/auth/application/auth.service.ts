@@ -63,7 +63,13 @@ export class AuthService {
       },
     });
 
-    return { accessToken, refreshToken, account: accountEntity };
+    const response = {
+      ...accountEntity,
+      password: undefined,
+      re_password: undefined,
+    }
+
+    return { accessToken, refreshToken, account: response };
   }
 
   async refresh(refreshToken: string) {

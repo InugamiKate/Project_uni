@@ -1,11 +1,22 @@
 import * as jwt from 'jsonwebtoken';
 import { config } from '../../config/config';
 
-export function signAccessToken(payload: object): string {
+export type JwtAccessPayload = {
+  uid: string;
+  account_role: string;
+  user_role: string | null;
+  major_id: string | null;
+};
+
+export type JwtRefreshPayload = {
+  accountId: string;
+};
+
+export function signAccessToken(payload: JwtAccessPayload): string {
   return jwt.sign(payload, config.jwt.accessSecret, { expiresIn: config.jwt.accessExpire });
 }
 
-export function signRefreshToken(payload: object): string {
+export function signRefreshToken(payload: JwtRefreshPayload): string {
   return jwt.sign(payload, config.jwt.refreshSecret, { expiresIn: config.jwt.refreshExpire });
 }
 
