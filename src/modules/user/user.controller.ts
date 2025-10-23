@@ -20,8 +20,9 @@ export class UserController {
   }
 
   @Get('list')
-  async findAll(@Query() query: ListUserDto) {
-    return this.userService.findAll(query);
+  async findAll(@Query() query: ListUserDto, @Req() req) {
+    const user = req.user;
+    return this.userService.findAll(query, user);
   }
 
   @Get('detail/:id')
@@ -37,6 +38,11 @@ export class UserController {
   @Delete('delete/:id')
   softDelete(@Param('id') id: string) {
     return this.userService.softDelete(String(id));
+  }
+
+  @Get('grades/:id')
+  getUserGrades(@Param('id') id: string) {
+    return this.userService.getUserGrades(String(id));
   }
   
 }

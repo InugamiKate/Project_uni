@@ -1,6 +1,6 @@
 // dto/list_user.dto.ts
 
-import { IsInt, IsOptional, IsString, IsIn, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsIn, Min, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -33,4 +33,9 @@ export class ListUserDto {
   @IsOptional()
   @IsIn(['asc', 'desc'], { message: 'Order must be asc or desc' })
   order?: 'asc' | 'desc' = 'desc';
+  
+  @ApiProperty({ required: false, example: 'major-123', description: 'ID of the Major to search' })
+  @IsOptional()
+  @IsUUID()
+  major_id?: string;
 }

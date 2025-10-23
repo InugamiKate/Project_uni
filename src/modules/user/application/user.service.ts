@@ -7,7 +7,7 @@ import { UpdateUserDto } from '../dto/update_user.dto';
 import { ListUserDto } from '../dto/list_user.dto';
 import {hashPassword} from '../../../infrastructure/common/crypto.util';
 import { TextUtil } from 'src/infrastructure/common/text.util';
-import { USER_ROLES, STUDENT_COURSE_EXAM_STATUS } from 'src/constants/constant';
+import { ACCOUNT_ROLES, USER_ROLES, STUDENT_COURSE_EXAM_STATUS } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -94,12 +94,20 @@ export class UserService {
     }
   }
 
-  async findAll(query: ListUserDto) {
-    const { offset, limit, name, orderBy, order } = query;
+  async findAll(query: ListUserDto, user: any) {
+    const { offset, limit, name, orderBy, order, major_id } = query;
 
     const where: Prisma.UserWhereInput = {
       deleted: false,
     };
+
+    if (user.account_role !== ACCOUNT_ROLES.ADMIN) {
+      where.major_id = user.major_id || null;
+    } else {
+      if (major_id) {
+        where.major_id = major_id;
+      }
+    }
 
     if (name) {
       let name_plain = TextUtil.skipVN(name);
@@ -136,5 +144,26 @@ export class UserService {
         major: true,           // nếu có quan hệ major
       },
     });
+  }
+
+  async getUserGrades(id: string) {
+    const grades = await this.prisma.studentCourse.findMany({
+      where: { student_id: id },
+      include: {
+        course: true,
+      },
+    });
+
+    for (const { course, ...rest } of grades) {
+      const exams = await this.prisma.exam.findMany({
+        where: { course_id: course.id, deleted: false },
+        include: {
+          ExamGrade: true
+        }
+      })
+      course['exams'] = exams;
+    }
+
+    return grades;
   }
 }

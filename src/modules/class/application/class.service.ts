@@ -22,7 +22,7 @@ export class ClassService {
     }
 
     // Only admin and program_head can create class
-    if (user.user_role !== ACCOUNT_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+    if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
       throw new ForbiddenException('You do not have permission to create a class');
     }
 
