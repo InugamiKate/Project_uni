@@ -1,11 +1,12 @@
 // application/user.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateUserDto } from '../dto/create_user.dto';
 import { UpdateUserDto } from '../dto/update_user.dto';
 import { ListUserDto } from '../dto/list_user.dto';
 import {hashPassword} from '../../../infrastructure/common/crypto.util';
+import { comparePassword } from '../../../infrastructure/common/crypto.util';
 import { TextUtil } from 'src/infrastructure/common/text.util';
 import { ACCOUNT_ROLES, USER_ROLES, STUDENT_COURSE_EXAM_STATUS } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
@@ -181,5 +182,47 @@ export class UserService {
     }
 
     return grades;
+  }
+
+  async changePassword(query: any, user: any) {
+    const { new_password, old_password } = query;
+    let { user_id } = query;
+
+    // Only admin can change other user's password
+    if (user.account_role !== ACCOUNT_ROLES.ADMIN && user_id && user_id !== user.uid) {
+      throw new ForbiddenException('Unauthorized to change other user password');
+    }
+
+    // If not admin, user_id is from token
+    if (user.account_role !== ACCOUNT_ROLES.ADMIN) {
+      user_id = user.uid;
+    }
+
+    // validate input
+    if (!new_password || !old_password) {
+      throw new BadRequestException('New password and old password are required');
+    }
+
+    const account = await this.prisma.account.findFirst({
+      where: { user_id: user_id },
+    })
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    // kiểm tra password
+    const valid = await comparePassword(old_password, account.password);
+    if (!valid) {
+      throw new BadRequestException('Old password is incorrect');
+    }
+
+    const hashedPassword = await hashPassword(new_password);
+
+    await this.prisma.account.update({
+      where: { id: account.id },
+      data: { password: hashedPassword },
+    });
+
+    return { message: 'Password changed successfully' };
   }
 }

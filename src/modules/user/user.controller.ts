@@ -3,6 +3,7 @@ import { UserService } from './application/user.service';
 import { CreateUserDto } from './dto/create_user.dto';
 import { UpdateUserDto } from './dto/update_user.dto';
 import { ListUserDto } from './dto/list_user.dto';
+import { ChangePasswordDto } from './dto/change_password.dto';
 import { Query } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from '../../infrastructure/common/guard/jwtAuth.guard';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -43,6 +44,12 @@ export class UserController {
   @Get('grades/:id')
   getUserGrades(@Param('id') id: string) {
     return this.userService.getUserGrades(String(id));
+  }
+
+  @Put('change-password')
+  async changePassword(@Query() query: ChangePasswordDto, @Req() req) {
+    const user = req.user;
+    return this.userService.changePassword(query, user);
   }
   
 }
