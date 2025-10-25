@@ -91,6 +91,22 @@ export class UserService {
           },
         });
       }
+
+      // get the welcome notification
+      const welcome_notification = await this.prisma.notification.findFirst({
+        where: { created_by: "system", title: 'Welcome to Project Uni' }
+      });
+
+      if (welcome_notification) {
+        // create user_notification
+        await this.prisma.notificationUser.create({
+          data: {
+            user_id: new_student.id,
+            notification_id: welcome_notification.id,
+            is_read: false,
+          }
+        });
+      }
     }
   }
 

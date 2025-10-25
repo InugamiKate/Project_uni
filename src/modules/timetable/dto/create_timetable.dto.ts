@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsArray, IsUUID, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTimetableDto {
@@ -47,13 +47,13 @@ export class CreateTimetableDto {
   @IsString()
   mi_id?: string;
 
-  @ApiProperty({ example: '2025-10-20T09:00:00Z', required: false })
+  @ApiProperty({ example: '9:00', required: false })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   start_time: string;
 
-  @ApiProperty({ example: '2025-10-20T11:00:00Z', required: false })
+  @ApiProperty({ example: '11:00', required: false })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   end_time: string;
 }

@@ -274,6 +274,7 @@ model ExamGrade {
   grade           Float
   is_passed       Boolean   @default(true)
   created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
 
   student         User      @relation(fields: [student_id], references: [id])
   exam            Exam      @relation(fields: [exam_id], references: [id])
@@ -314,11 +315,12 @@ model Timetable {
   location        String?
   day             String
   period          String
-  time_start      DateTime?
-  time_end        DateTime?
+  time_start      String?
+  time_end        String?
   object_type     String
   object_id       String?
   is_deleted      Boolean       @default(false)
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
+  created_by      String?
 }

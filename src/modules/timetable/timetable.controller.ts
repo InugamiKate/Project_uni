@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req } from '@nes
 import { TimetableService } from './application/timetable.service';
 import { ListTimetableDto } from './dto/list_timetable.dto';
 import { CreateTimetableDto } from './dto/create_timetable.dto';
-import { Query } from '@nestjs/common/decorators';
+import { Patch, Query } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from '../../infrastructure/common/guard/jwtAuth.guard';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
@@ -17,6 +17,12 @@ export class TimetableController {
   create(@Body() dto: CreateTimetableDto , @Req() req) {
     const user = req.user;
     return this.timetableService.create(dto, user);
+  }
+
+  @Patch('update/:id')
+  update(@Param('id') id: string, @Body() dto: CreateTimetableDto, @Req() req) {
+    const user = req.user;
+    return this.timetableService.update(id, dto, user);
   }
 
   @Get('list')

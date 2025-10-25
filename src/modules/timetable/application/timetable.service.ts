@@ -43,8 +43,9 @@ export class TimetableService {
         object_id: object_id || null,
         major_id: major_id,
         mi_id: mi_id || null,
-        time_start: start_time ? new Date(start_time) : null,
-        time_end: end_time ? new Date(end_time) : null,
+        time_start: start_time || null,
+        time_end: end_time || null,
+        created_by: user.user_id,
       }
     })
 
@@ -185,6 +186,57 @@ export class TimetableService {
     return {
       success: true,
       message: 'Timetable entry deleted successfully',
+    }
+  }
+
+  async update(id: string, dto: CreateTimetableDto, user: any) {
+
+    // Only admin and program_head can update timetable
+    if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+      throw new ForbiddenException('You do not have permission to update a timetable entry');
+    }
+
+    const timetable = await this.prisma.timetable.findFirst({
+      where: {
+        id: id,
+        is_deleted: false,
+      }
+    });
+
+    if (!timetable) {
+      throw new NotFoundException('Timetable entry not found');
+    }
+
+    const { name, description, location, day, period, object_type, object_id, major_id, mi_id, start_time, end_time } = dto;
+
+    if (!name || !object_type || !day || !period) {
+      throw new BadRequestException('Missing required fields');
+    }
+
+    if (!Object.values(TIMETABLE_OBJECT_TYPE).includes(object_type as any) || !Object.values(DAY_OF_WEEK).includes(day as any) || !Object.values(PERIOD_OF_DAY).includes(period as any)) {
+      throw new BadRequestException('Invalid timetable entry data');
+    }
+
+    await this.prisma.timetable.update({
+      where: { id: id },
+      data: {
+        name: name,
+        description: description || null,
+        location: location || null,
+        day: day,
+        period: period,
+        object_type: object_type,
+        object_id: object_id || null,
+        major_id: major_id || null,
+        mi_id: mi_id || null,
+        time_start: start_time || null,
+        time_end: end_time || null,
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Timetable entry updated successfully',
     }
   }
 

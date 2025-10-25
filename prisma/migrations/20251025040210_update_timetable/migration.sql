@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Timetable" ALTER COLUMN "time_start" SET DATA TYPE TEXT,
+ALTER COLUMN "time_end" SET DATA TYPE TEXT;
