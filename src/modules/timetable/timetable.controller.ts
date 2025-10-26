@@ -47,4 +47,10 @@ export class TimetableController {
     const user = req.user;
     return this.timetableService.deleteOne(id, user);
   }
+
+  @Get('list_by_lecture_use_object_type')
+  async findByLecture(@Query() query: ListTimetableDto, @Req() req) {
+    const user = req.user;
+    return this.timetableService.findByLecture(query, user);
+  }
 }

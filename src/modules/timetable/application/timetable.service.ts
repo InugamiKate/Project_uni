@@ -255,4 +255,47 @@ export class TimetableService {
     }
   }
 
+  async findByLecture(dto: ListTimetableDto, user: any) {
+    const uid = user.user_id;
+    const { mi_id } = dto;
+
+    if (!uid) {
+      throw new BadRequestException('Current user ID is missing');
+    }
+
+    if (!mi_id) {
+      throw new BadRequestException('Intake is required');
+    }
+
+    // Only teachers can view their timetable
+    if (user.user_role !== USER_ROLES.TEACHER) {
+      throw new ForbiddenException('You do not have permission to view this timetable');
+    }
+
+    // Get all classes taught by the teacher
+    const classes = await this.prisma.class.findMany({
+      where: {
+        lecturer_id: uid,
+        deleted: false,
+      }
+    });
+
+    const classIds = classes.map(c => c.id);
+
+    // Get timetables for those classes
+    const timetables = await this.prisma.timetable.findMany({
+      where: {
+        object_type: TIMETABLE_OBJECT_TYPE.CLASS,
+        object_id: { in: classIds },
+        mi_id: mi_id,
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Timetable entries retrieved successfully',
+      data: timetables
+    };
+  }
+
 }
