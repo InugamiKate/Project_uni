@@ -366,7 +366,7 @@ async function main() {
         data: {
             username: 'cs_lecturer_acc',
             password,
-            role: 'USER',
+            role: 'LECTURER',
             user_id: lecturerUserCS.id,
         },
     });
@@ -375,7 +375,7 @@ async function main() {
         data: {
             username: 'ee_lecturer_acc',
             password,
-            role: 'USER',
+            role: 'LECTURER',
             user_id: lecturerUserEE.id,
         },
     });
