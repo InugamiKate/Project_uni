@@ -1,6 +1,6 @@
 // dto/list_timetable.dto.ts
 
-import { IsInt, IsOptional, IsString, IsIn, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsIn, Min, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -25,7 +25,7 @@ export class ListTimetableDto {
   major_id?: string = '';
 
   @ApiProperty({required: false,  example: 'id of intake' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   mi_id?: string = '';
 }

@@ -89,15 +89,27 @@ export class TimetableService {
     const timetables = await this.prisma.timetable.findMany({
       where,
       orderBy,
-      skip: data.offset ?? 0,
-      take: data.limit ?? 50,
+      skip: Number(data.offset) || 0,
+      take: Number(data.limit) || 50,
     });
+
+    for (let item of timetables) {
+      if (item.object_type !== TIMETABLE_OBJECT_TYPE.OTHER && item.object_id) {
+        if (item.object_type === TIMETABLE_OBJECT_TYPE.CLASS) {
+          item['object'] = await this.prisma.class.findUnique({ where: { id: item.object_id } });
+        } else if (item.object_type === TIMETABLE_OBJECT_TYPE.EXAM) {
+          item['object'] = await this.prisma.exam.findUnique({ where: { id: item.object_id } });
+        } else {
+          item['object'] = null;
+        }
+      }
+    }
 
     return timetables;
   }
 
   async findByUser(data: ListTimetableDto, user: any) {
-    const { major_id, mi_id } = data;
+    const { major_id, mi_id, offset, limit } = data;
 
     const where : any = {
       is_deleted: false,
@@ -110,33 +122,36 @@ export class TimetableService {
       where.major_id = major_id;
     }
 
-    // Not student so that can filter by mi_id
-    if (mi_id && user.user_role !== USER_ROLES.STUDENT) {
-      // Check if mi_id is exists
-      const mi = await this.prisma.majorIntake.findUnique({ where: { id: mi_id } });
-      if (!mi) {
-        throw new NotFoundException('Major intake not found');
-      }
-      where.mi_id = mi_id;
+    if (!mi_id) {
+      throw new BadRequestException('mi_id is required');
     }
-
-    // If student, mi_id is from student info
-    if (user.user_role === USER_ROLES.STUDENT) {
-      const student = await this.prisma.user.findUnique({ where: { id: user.user_id } });
-      if (!student) {
-        throw new NotFoundException('Student not found');
-      }
-      where.mi_id = student.mi_id;
+    // Check if mi_id is exists
+    const mi = await this.prisma.majorIntake.findUnique({ where: { id: mi_id } });
+    if (!mi) {
+      throw new NotFoundException('Major intake not found');
     }
+    where.mi_id = mi_id;
 
     var orderBy: any = [{ created_at: 'asc' }, { day: 'asc' }, { period: 'asc' }];
 
     const timetables = await this.prisma.timetable.findMany({
       where,
       orderBy,
-      skip: data.offset ?? 0,
-      take: data.limit ?? 10,
+      skip: Number(offset) || 0,
+      take: Number(limit) || 10,
     });
+
+    for (let item of timetables) {
+      if (item.object_type !== TIMETABLE_OBJECT_TYPE.OTHER && item.object_id) {
+        if (item.object_type === TIMETABLE_OBJECT_TYPE.CLASS) {
+          item['object'] = await this.prisma.class.findUnique({ where: { id: item.object_id } });
+        } else if (item.object_type === TIMETABLE_OBJECT_TYPE.EXAM) {
+          item['object'] = await this.prisma.exam.findUnique({ where: { id: item.object_id } });
+        } else {
+          item['object'] = null;
+        }
+      }
+    }
 
     return {
       success: true,
