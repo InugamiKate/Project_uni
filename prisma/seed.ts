@@ -35,6 +35,15 @@ async function main() {
         },
     });
 
+    const csIntake2024 = await prisma.majorIntake.create({
+        data: {
+            major_id: csMajor.id,
+            intake: '2024',
+            total_weight: 125,
+            created_by: 'system',
+        },
+    });
+
     const eeIntake2023 = await prisma.majorIntake.create({
         data: {
             major_id: eeMajor.id,
@@ -779,6 +788,76 @@ async function main() {
                 object_type: 'EXAM',
                 object_id: exam2.id,
                 created_by: headCSUser.id,
+            },
+            {
+                major_id: csMajor.id,
+                mi_id: csIntake2024.id,
+                name: 'Class CS101B Timetable',
+                description: 'Timetable for class CS101B',
+                location: 'Building B, Room 201',
+                day: 'MONDAY',
+                period: 'MORNING',
+                time_start: '9:00',
+                time_end: '11:00',
+                object_type: 'CLASS',
+                object_id: class2.id,
+                created_by: headCSUser.id,
+            },
+            {
+                major_id: csMajor.id,
+                mi_id: csIntake2024.id,
+                name: 'Class CS101B Timetable',
+                description: 'Timetable for class CS101B',
+                location: 'Building B, Room 201',
+                day: 'WEDNESDAY',
+                period: 'MORNING',
+                time_start: '9:00',
+                time_end: '11:00',
+                object_type: 'CLASS',
+                object_id: class2.id,
+                created_by: headCSUser.id,
+            },
+            {
+                major_id: csMajor.id,
+                mi_id: csIntake2024.id,
+                name: 'Class CS101B Timetable',
+                description: 'Timetable for class CS101B',
+                location: 'Building B, Room 201',
+                day: 'FRIDAY',
+                period: 'MORNING',
+                time_start: '9:00',
+                time_end: '11:00',
+                object_type: 'CLASS',
+                object_id: class2.id,
+                created_by: headCSUser.id,
+            },
+            {
+                major_id: eeMajor.id,
+                mi_id: eeIntake2023.id,
+                name: 'Class EE101A Timetable',
+                description: 'Timetable for class EE101A',
+                location: 'Building C, Room 301',
+                day: 'TUESDAY',
+                period: 'AFTERNOON',
+                time_start: '13:00',
+                time_end: '15:00',
+                object_type: 'CLASS',
+                object_id: class3.id,
+                created_by: headEEUser.id,
+            },
+            {
+                major_id: eeMajor.id,
+                mi_id: eeIntake2023.id,
+                name: 'Class EE101A Timetable',
+                description: 'Timetable for class EE101A',
+                location: 'Building C, Room 301',
+                day: 'THURSDAY',
+                period: 'AFTERNOON',
+                time_start: '13:00',
+                time_end: '15:00',
+                object_type: 'CLASS',
+                object_id: class3.id,
+                created_by: headEEUser.id,
             }
         ]
     });
@@ -868,7 +947,7 @@ async function main() {
         'Exams Created': 5,
         'Exam Registrations Created': 14,
         'Exam Grades Created': 6,
-        'Timetable Entries Created': 5,
+        'Timetable Entries Created': 10,
         'Notifications Created': 1,
         'Notification Users Created': 12,
     });
