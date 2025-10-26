@@ -161,8 +161,8 @@ export class NotificationService {
     const uid = user?.uid || null;
 
     // Only admin and program_head can create notification
-    if (user.account_role !== ACCOUNT_ROLES.ADMIN && user.account_role !== USER_ROLES.PROGRAM_HEAD) {
-      throw new ForbiddenException('You do not have permission to create an notification');
+    if (user.account_role !== ACCOUNT_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+      throw new ForbiddenException('You do not have permission to get list notification');
     }
 
     const whereClause: any = {};
