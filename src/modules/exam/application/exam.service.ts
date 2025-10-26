@@ -11,6 +11,7 @@ import { ValidateRegistDto } from '../dto/validate_regist.dto';
 import { CreateExamGradeDto } from '../dto/create_exam_grade.dto';
 import { ListExamGradeDto } from '../dto/list_exam_grade.dto';
 import { ListExamGradeStudentIdDto } from '../dto/list_exam_grade_student_id.dto';
+import { UpdateExamGradeDto } from '../dto/update_exam_grade.dto';
 import { TextUtil } from 'src/infrastructure/common/text.util';
 import { ACCOUNT_ROLES, USER_ROLES, STUDENT_COURSE_EXAM_STATUS, EXAM_STATUS, REGIST_STATUS, EXAM_REGIST } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
@@ -414,12 +415,14 @@ export class ExamService {
 
   async listExamGrades(examId: string, query: ListExamGradeDto, user: any) {
     const { offset, limit, orderBy, order } = query;
-
-    console.log('listExamGrades called with examId:', examId, 'and query:', query);
     
     const where: Prisma.ExamGradeWhereInput = {
       exam_id: examId
     };
+
+    if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+      throw new ForbiddenException('You do not have permission to view exam grades');
+    }
 
     const list = await this.prisma.examGrade.findMany({
       where: where,
@@ -429,6 +432,13 @@ export class ExamService {
         [orderBy || 'grade']: order || 'desc',
       },
     });
+
+    for (let item of list) {
+      if (item.student_id) {
+        let student = await this.prisma.user.findUnique({ where: { id: item.student_id } });
+        item['student_name'] = student?.name || null;
+      }
+    }
 
     const count = await this.prisma.examGrade.count({ where });
 
@@ -486,6 +496,39 @@ export class ExamService {
     const count = await this.prisma.course.count({ where });
 
     return { filteredList, count };
+  }
+
+  async updateExamGrade(id: string, dto: UpdateExamGradeDto, user: any) {
+    const { grade, is_passed } = dto;
+    if (!id) {
+      throw new BadRequestException('ID is required for update exam grade');
+    }
+    const examGrade = await this.prisma.examGrade.findUnique({ where: { id : id } });
+    if (!examGrade) {
+      throw new NotFoundException('Exam grade not found');
+    }
+    const uid = user?.uid || null;
+    if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+      throw new ForbiddenException('You do not have permission to update exam grades');
+    }
+    if (!uid) {
+      throw new BadRequestException('User ID not found');
+    } else {
+      const userInfo = await this.prisma.user.findUnique({ where: { id: uid } });
+      if (!userInfo) {
+        throw new NotFoundException('User not found');
+      }
+    }
+
+    await this.prisma.examGrade.update({
+      where: { id },
+      data: {
+        grade: Number(grade),
+        is_passed: Boolean(is_passed),
+      },
+    });
+
+    return { message: 'Exam grade updated successfully' };
   }
 
 }

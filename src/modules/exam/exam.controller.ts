@@ -8,6 +8,7 @@ import { ListExamAttendDto } from './dto/list_exam_attend.dto';
 import { CreateExamGradeDto } from './dto/create_exam_grade.dto';
 import { ListExamGradeDto } from './dto/list_exam_grade.dto';
 import { ListExamGradeStudentIdDto } from './dto/list_exam_grade_student_id.dto';
+import { UpdateExamGradeDto } from './dto/update_exam_grade.dto';
 import { ValidateRegistDto } from './dto/validate_regist.dto';
 import { Query } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from '../../infrastructure/common/guard/jwtAuth.guard';
@@ -94,5 +95,11 @@ export class ExamController {
   async listExamGradesStudent(@Query() query: ListExamGradeStudentIdDto, @Req() req) {
     const user = req.user;
     return this.examService.listExamGradesStudent(query, user);
+  }
+
+  @Put('update_exam_grade/:id')
+  updateExamGrade(@Param('id') id: string, @Body() dto: UpdateExamGradeDto, @Req() req) {
+    const user = req.user;
+    return this.examService.updateExamGrade(String(id), dto, user);
   }
 }
