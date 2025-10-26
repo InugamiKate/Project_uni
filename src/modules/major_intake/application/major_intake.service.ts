@@ -1,10 +1,11 @@
 // application/major_intake.service.ts
 
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
 import { CreateMajorIntakeDto } from '../dto/create_major_intake.dto';
 import { UpdateMajorIntakeDto } from '../dto/update_major_intake.dto';
 import { ListMajorIntakeDto } from '../dto/list_major_intake.dto';
+import { USER_ROLES } from 'src/constants/constant';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -45,15 +46,25 @@ export class MajorIntakeService {
     return majorIntake;
   }
 
-  async findAll(query: ListMajorIntakeDto) {
+  async findAll(query: ListMajorIntakeDto, user: any) {
     const { offset, limit, orderBy, order, major_id, intake } = query;
+
+    // Only admin and program_head can view major intakes
+    if (user.user_role !== USER_ROLES.ADMIN && user.user_role !== USER_ROLES.PROGRAM_HEAD) {
+      throw new ForbiddenException('You do not have permission to view major intakes');
+    }
 
     const where: Prisma.MajorIntakeWhereInput = {
       deleted: false,
     };
 
-    if (major_id) {
-      where.major_id = major_id;
+    if (user.user_role === USER_ROLES.PROGRAM_HEAD) {
+      // If program head, restrict to their major only
+      where.major_id = user.major_id;
+    } else {
+      if (major_id) {
+        where.major_id = major_id;
+      }
     }
 
     if (intake) {

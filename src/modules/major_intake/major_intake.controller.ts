@@ -21,8 +21,9 @@ export class MajorIntakeController {
   }
 
   @Get('list')
-  async findAll(@Query() query: ListMajorIntakeDto) {
-    return this.majorIntakeService.findAll(query);
+  async findAll(@Query() query: ListMajorIntakeDto, @Req() req) {
+    const user = req.user;
+    return this.majorIntakeService.findAll(query, user);
   }
 
   @Get('detail/:id')
